@@ -1,0 +1,49 @@
+{
+	"secret_id":"",
+	"secret_key":"",
+	"region":"ap-shanghai",
+	"vpc":{
+		"vpc_name":"api_test",
+		"vpc_cidr":"192.168.0.0/16"
+	},
+	"subnet":{
+		"subnet_name":"api_test1",
+		"zone":"ap-shanghai-2",
+		"subnet_cidr":"192.168.1.0/24"
+	},
+	"security_group":{
+		"sg_name":"api_test",
+        "sg_des": "for test"
+	},
+    "sg_in": {
+        "PolicyIndex": "1",
+        "Protocol": "TCP",
+        "Port": "all",
+        "CidrBlock": "0.0.0.0/0",
+        "Action": "ACCEPT",
+        "Des": "accept all"
+    },
+  "sg_out": {
+	  "PolicyIndex": "1",
+	  "Protocol": "TCP",
+	  "Port": "all",
+	  "CidrBlock": "0.0.0.0/0",
+	  "Action": "ACCEPT",
+	  "Des": "accept all"
+  	},
+	"ssh_key":{
+		"key_name":"api_test"
+	},
+	"cvm_info": {
+		"InstanceChargeType":"POSTPAID_BY_HOUR",
+		"Placement":{"Zone":"ap-shanghai-2"},
+		"InstanceType":"S2.SMALL1",
+		"ImageId":"img-8toqc6s3",
+		"SystemDisk":{"DiskType":"CLOUD_PREMIUM","DiskSize":"50"},
+		"DataDisks.N":[{"DiskType":"CLOUD_BASIC","DiskSize":"10"}],
+		"InternetAccessible":{"InternetChargeType":"TRAFFIC_POSTPAID_BY_HOUR","InternetMaxBandwidthOut":"1","PublicIpAssigned":"TRUE"},
+		"InstanceCount":"1",
+		"InstanceName":"api_test",
+		"HostName":"test.com"
+	}
+}

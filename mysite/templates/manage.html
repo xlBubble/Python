@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+        <title>日常巡检</title>
+        <!-- 引入 Bootstrap -->
+        <link href="/static/css/bootstrap.css" rel="stylesheet">
+        <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+        <script src="/static/js/jquery.js"></script>
+        <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+        <script src="/static/js/bootstrap.js"></script>
+        <!--加载notify js插件-->
+        <script src="/static/bootstrap-notify-master/bootstrap-notify.js"></script>
+        <link href="/static/animate.min.css" rel="stylesheet">
+        <!--加载select 插件-->
+        <script src="/static/js/bootstrap-select.min.js"></script>
+        <link href="/static/css/bootstrap-select.min.css" rel="stylesheet">
+        <!--自定义css样式-->
+        <link href="/static/css/mystyle.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+       <style>
+            .btn-self{
+                background-color: Transparent;
+                color:#00547B;
+                border-style: none;
+                outline: none;
+                box-shadow:none;
+            }
+            .btn-self:hover {
+                color:#00547B;
+            }
+            .btn-self:focus{
+                color:#00547B;
+                outline: none;
+                box-shadow:none;
+            }
+            .btn-self:active {
+                color:#00547B;
+                border:none;
+                outline: none;
+                box-shadow:none;
+            }
+            .form-self {
+                display: inline;
+                width: 150px;
+                height: 34px;
+                padding: 6px 12px;
+                font-size: 14px;
+                line-height: 1.42857143;
+                color: #555;
+                background-color: #fff;
+                background-image: none;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+                    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+                -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+                    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+                        transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+            }
+       </style>
+    </head>
+    <body>
+        <!--定义容器-->
+        <div style="padding: 0;margin: 0">
+            <!--左侧列表start------------->
+            <div class="left_item">
+                <div style="padding-top: 10px;"  align="center" >
+                    <img src="/static/aclogo.png"  alt="logo">
+                </div>
+                <ul class="list-group" style="padding-top: 10px;">
+                    <li><a href='#' class='list-group-item active'>
+                        <span class="glyphicon glyphicon-play" aria-hidden="true" style="margin-left: 5px"></span> 开始巡检</a></li>
+                    <li><a href='#' id="event_add" class="list-group-item" >
+                        <span class="glyphicon glyphicon-plus"  aria-hidden="true" style="margin-left: 5px"></span> 事件新增</a></li>
+                    <li> <a href='#' class="list-group-item">
+                        <span class="glyphicon glyphicon-user" aria-hidden="true" style="margin-left: 5px"></span> 客户管理</a></li>
+                    <li><a href='#' class="list-group-item">
+                        <span class="glyphicon glyphicon-list-alt" aria-hidden="true" style="margin-left: 5px"></span> 操作日志</a></li>
+                </ul>
+            </div>
+            <!--左侧列表end--------------->
+            <!--右侧内容start------------->
+            <div id="div_content" class="right_content">
+                <!--定义导航条 ----------->
+                <div class="box_in_top navbar navbar-default navbar-fixed-top" style="margin-left: 230px;">
+                    <a href="#" style="float: left; padding:20px;"><span class="glyphicon glyphicon-th-large" aria-hidden="true"></span>首页</a>
+                    <div class="dropdown" style="float: right;margin-top:20px">
+                        <a href="#" aria-expanded="true" data-toggle="dropdown" aria-label="user manager">{{ name }} <span class="glyphicon glyphicon-menu-down"></span></a>
+                        <ul class="dropdown-menu settings-menu dropdown-menu-right">
+                            <li style="" >
+                                <a href="#" class="dropdown-item" style="color:#0066cc"><i class="fa fa-cog fa-lg"></i> 用户管理</a>
+                            </li>
+                            <li style="">
+                                <a href="logout" class="dropdown-item" style="color:#0066cc"><i class="fa fa-sign-out fa-lg"></i> 退出</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!--各功能内容定义-->
+                <!--开始巡检start-->
+                <div class="zone_pattern" id="div_home" style="margin-top: 80px">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#start" aria-controls="start" role="tab" data-toggle="tab">开始巡检</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#checklog" aria-controls="checklog" role="tab" data-toggle="tab" id="get_event">记录查询</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#set_auto_check" aria-controls="set_auto_check" role="tab" data-toggle="tab" id="auto_check">定时巡检</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" style="padding: 10px;">
+                        <div class="tab-pane active" id="start" >
+                            <button id="check_all" class="btn btn-primary box_relative" onclick="check_confirm(this)">巡检所有</button>
+                            <table id="check_table" class="table table-bordered table-striped table-responsive" style="text-align: center;">
+                                <tr>
+                                    <td>客户</td>
+                                    <td>子账号</td>
+                                    <td>所属云</td>
+                                    <td>操作</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="tab-pane" id="checklog">
+                            <div class="col-lg-8 col-md-8 col-sm-10" style="padding:0px;display: flex;justify-content: space-around;">
+                                <div style="margin:2px">
+                                    <label>客户：</label>
+                                    <select  class="form-self" id="s_get_name">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div >
+                                <div style="margin:2px ">
+                                    <label>子账号：</label>
+                                    <select class="form-self" id="s_get_account">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                                <div style="margin:2px ">
+                                    <input checked="checked" type="radio" name="period" id="all" value="all" />全部
+                                    <input type="radio" name="period" id="week" value="week" />一周
+                                    <input type="radio" name="period" id="month" value="month" />一月
+                                    <button class="btn btn-primary btn-sm" onclick="show_event_info()">查 找</button>
+                                </div>
+                            </div>
+                            <div style="padding-top: 50px">
+                                <table class="table table-striped table-bordered" id="event_table">
+                                    <tr>
+                                        <td>日期</td>
+                                        <td>巡检方式</td>
+                                        <td>事件类型</td>
+                                        <td>事件描述</td>
+                                        <td>产品</td>
+                                        <td>处理情况</td>
+                                        <td>处理人</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="set_auto_check">
+                            <p> To Be Continued</p>
+                        </div>
+                    </div>
+                </div>
+                <!--开始巡检end-->
+                <!--事件新增start-->
+                <div class="zone_pattern" id="div_event" style="margin-top: 80px">
+                    <div class="form-group" style="display: flex;justify-content: space-around;">
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                        <p>客户名称：</p>
+                        </div>
+                        <div class="col-lg-10 col-md-10 col-sm-8">
+                            <select id="e_get_name" class="form-control">
+                            <option value="">请选择</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: flex;justify-content: space-around;">
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                        <p>子账号：</p>
+                        </div>
+                        <div class="col-lg-10 col-md-10 col-sm-8">
+                            <select id="e_get_account" class="form-control">
+                                <option value="">请选择</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: flex;justify-content: space-around;">
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                        <p>产品类型：</p>
+                        </div>
+                        <div class="col-lg-10 col-md-10 col-sm-8">
+                            <select  id="add_product"  class="form-control">
+                                <option value="">请选择</option>
+                                <option value="ECS">ECS/CVM</option>
+                                <option value="RDS">RDS/CDB</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: flex;justify-content: space-around;">
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                        <p>事件类型：</p>
+                        </div>
+                        <div class="col-lg-10 col-md-10 col-sm-8">
+                        <select  id="add_type"  class="form-control">
+                            <option value="">请选择</option>
+                            <option value="资源巡检">资源巡检</option>
+                            <option value="故障处理">故障处理</option>
+                            <option value="新增部署">新增部署</option>
+                            <option value="系统调试">系统调试</option>
+                            <option value="其他其他">其他</option>
+                        </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: flex;justify-content: space-around;">
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                        <p>事件描述：</p>
+                        </div>
+                        <div class="col-lg-10 col-md-10 col-sm-8">
+                            <textarea id="add_detail" rows="2" cols="20" class="form-control"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: flex;justify-content: space-around;">
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                        <p>处理情况：</p>
+                        </div>
+                        <div class="col-lg-10 col-md-10 col-sm-8">
+                        <select  id="add_status"  class="form-control">
+                            <option value="">请选择</option>
+                            <option value="已处理">已处理</option>
+                            <option value="处理中">处理中</option>
+                            <option value="已暂停">已暂停</option>
+                            <option value="已取消">已取消</option>
+                        </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: flex;justify-content: space-around;">
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                        <p>处理人：</p>
+                        </div>
+                        <div class="col-lg-10 col-md-10 col-sm-8">
+                        <select id="add_manager"  class="form-control">
+                            <option value="">请选择</option>
+                            <option value="test">{{ name }}</option>
+                        </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="text-align: center">
+                        <button id="submit_event" class="btn btn-info box_relative" type="button" onclick="add_event()">提 交</button>
+                        <button id="cancel" class="btn btn-warning box_relative" type="button" onclick="cancel()">取 消</button>
+                    </div>
+                </div>
+                <!--事件新增end-->
+                <!--客户管理start-->
+                <div class="zone_pattern" style="margin-top: 80px">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#add" aria-controls="add" role="tab" data-toggle="tab">客户新增</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#select" aria-controls="select" role="tab" data-toggle="tab" onclick="show_cli()">客户查询</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" style="padding: 20px;">
+                        <div class="tab-pane active" id="add" >
+                            <table border="0" class="table">
+                                <tr>
+                                    <td>客户名</td>
+                                    <td><input class="form-control" type="text" name="cli_name" id="cli_name"/></td>
+                                </tr>
+                                <tr>
+                                    <td>子账号</td>
+                                    <td><input class="form-control" type="text" name="sub_account" id="sub_account"/></td>
+                                </tr>
+                                <tr>
+                                    <td>所属云</td>
+                                    <td><input checked="checked" type="radio" name="check_cloud" id="txy" value="txy" />腾讯云
+                                        <input type="radio" name="check_cloud" id="aliy" value="aliy" />阿里云
+                                        <input type="radio" name="check_cloud" id="aws" value="aws" />AWS
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>地域</td>
+                                    <td>
+                                        <select id="select_region" class="selectpicker form-control " data-live-search="true" multiple>
+                                            <option value="">fe</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>API ID</td>
+                                    <td><input class="form-control" type="text" name="api_id" id="api_id"/></td>
+                                </tr>
+                                <tr>
+                                    <td>API KEY</td>
+                                    <td><input class="form-control" type="password" name="api_key" id="api_key"/></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" align="center" valign="middle">
+                                        <button id="cli_confirm" class="btn btn-primary box_relative" type="button" onclick="api_confirm()">API测试</button>
+                                        <button id="cli_submit" class="btn btn-info box_relative" type="button" onclick="cli_add()">提交信息</button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="tab-pane" id="select" >
+                            <table class="table table-striped table-bordered" id="select_table">
+                                <tr>
+                                    <td>客户名</td>
+                                    <td>账号</td>
+                                    <td>所属云</td>
+                                    <td>API ID</td>
+                                    <td>API KEY</td>
+                                </tr>
+                            </table>
+                            <div>
+                                <button id="check_all" class="btn btn-info box_relative" type="button" onclick="">修改信息</button>
+                                <button id="check_all" class="btn btn-danger box_relative" type="button" onclick="">删除客户</button>
+                            </div>
+                            <div class="col-lg-7 col-md-8 col-sm-10" style="padding:0px;display: flex;justify-content: space-around;">
+                                <div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!--客户管理end-->
+                <!--操作日志start-->
+                <div id="div_log" style="margin-top: 80px">
+                    <p>To Be Continued</p>
+                    <img src="../static/hdj.jpeg" alt="loading" style=" width: 170px;height: 200px">
+                </div>
+                <!--操作日志end-->
+            </div>
+            <!--右侧内容end--------------->
+        </div>
+    </body>
+    <script>
+        //将右侧的div内容隐藏起来
+        $(".right_content").children("div:gt(1)").hide();
+        //为左侧的链接增加一个点击的事件
+        $(".list-group").find("a").click(function() {
+            //把之前设置了选中样式的a的 选中效果去掉
+            $(".list-group").find(".active").removeClass("active");
+            //然后当前点击的是哪一个a就为a增加选中的样式
+            $(this).addClass("active");
+            //获取当前a的父元素li的下标值
+            var liindex = $(this).parent().index() + 1;
+            //对应的获取到右侧的div并且显示出来
+            $(".right_content").children(":visible").fadeOut(200, function() {
+                $(".right_content").children(":eq(0)").fadeIn(200);
+                $(".right_content").children(":eq(" + liindex + ")").fadeIn(200);
+            });
+        });
+
+        //api验证 api_confirm()
+        var test_result = '1';
+        function api_confirm() {
+            var cloud = $("input[name='cloud']:checked") .val();
+            var api_id = $("#api_id").val();
+            var api_key = $("#api_key").val();
+            $.ajax({
+                type : "POST",
+                url : "api_confirm",
+                data : {
+                    'cloud': cloud,
+                    'api_id': api_id,
+                    'api_key': api_key,
+            },
+                success : function(result) {
+                    var info_object = $.parseJSON(result);
+                    if (info_object[0].code === '0'){
+                        test_result = info_object[0].msg;
+                        if(info_object[0].msg === 0){
+                           $.notify({
+                                message:"测试成功",
+                               },{
+                               type: 'mysuccess',
+                           });
+                        }else{
+                            $.notify({
+                                message:"测试失败",
+                               },{
+                               type: 'myfail',
+                           });
+                        }
+
+                    }
+                    else {
+                        $.notify({
+                            message:info_object[0].msg,
+                        },
+                        {
+                            type: 'myfail',
+                        });
+                    }
+
+                }
+            });
+
+        }
+
+        //新增客户
+        function cli_add() {
+            if (test_result === '1'){
+                $.notify({
+                        message:"请先通过api测试",
+                    },
+                    {
+                        type: 'myfail',
+                    });
+            }else{
+            var cli_name = $("#cli_name").val();
+            var sub_account = $("#sub_account").val();
+            var cloud =  $("input[name='cloud']:checked") .val();
+            var api_id = $("#api_id").val();
+            var api_key = $("#api_key").val();
+            $.ajax({
+                type : "POST",
+                url : "cli_add",
+                data : {
+                    "cli_name" : cli_name,
+                    "sub_account":sub_account,
+                    'cloud': cloud,
+                    'api_id': api_id,
+                    'api_key': api_key,
+            },
+                success : function(result) {
+                    var info_object = $.parseJSON(result);
+                    if (info_object[0].code === '0'){
+                         $.notify({
+                            message:info_object[0].msg,
+                        },
+                        {
+                            type: 'mysuccess',
+                        });
+                    } else {
+                        $.notify({
+                            message:info_object[0].msg,
+                        },
+                        {
+                            type: 'myfail',
+                        });
+                    }
+                }
+            });
+            }
+        }
+
+        //查询客户
+        function show_cli(){
+            $("#select_table tbody").children("tr:gt(0)").empty();
+            $.ajax({
+                type : "POST",
+                url : "show_cli",
+                data : {},
+                success : function(result) {
+                    var info_object = $.parseJSON(result);
+                    if (info_object.code === "0"){
+                        // msg: <[{},{}]>
+                        for(i=0;i<info_object.msg.length;i++){
+                            item = info_object.msg[i];
+                            tr_cont = '<tr><td>'
+                                + item.name +'</td><td>'
+                                + item.account+ '</td><td>'
+                                + item.cloud+ '</td><td>'
+                                + item.api_id+ '</td><td>'
+                                + item.api_key +
+                                '</td></tr>';
+                            $("#select_table tbody").append(tr_cont);
+                        }
+                    }else{
+                        $.notify({
+                            message:"查询失败",
+                        },
+                        {
+                            type: 'myfail',
+                        });
+                    }
+                }
+            });
+        }
+        //修改客户信息
+        //删除客户
+
+        // 查询 show_cli_name
+        $("#event_add").click(function (){
+            $("#e_get_name").children("option:gt(0)").remove();
+            $.ajax({
+                type: "POST",
+                url: "show_cli_name",
+                data: {},
+                success: function (result) {
+                    var info_object = $.parseJSON(result);
+                    if (info_object.code === "0"){
+                        // msg: <[{},{}]>
+                        var array = new Array(0);
+                        for(i=0;i<info_object.msg.length;i++) {
+                            item = info_object.msg[i].name;
+                            array.push(item)
+                        }
+                        var cli_info = $.unique(array.sort());
+                        for(i=0;i<cli_info.length;i++){
+                            op_cont = '<option value=' + cli_info[i] + '>' + cli_info[i] + '</option>';
+                            $('#e_get_name').append(op_cont);
+                        }
+                    }else{
+                        $.notify({
+                            message:"获取客户失败",
+                        },
+                        {
+                            type: 'myfail',
+                        });
+                    }
+                }
+            });
+        });
+        $("#get_event").click(function (){
+            $("#s_get_name").children("option:gt(0)").remove();
+            $.ajax({
+                type: "POST",
+                url: "show_cli_name",
+                data: {},
+                success: function (result) {
+                    var info_object = $.parseJSON(result);
+                    if (info_object.code === "0"){
+                        // msg: <[{},{}]>
+                        var array = new Array(0);
+                        for(i=0;i<info_object.msg.length;i++) {
+                            item = info_object.msg[i].name;
+                            array.push(item)
+                        }
+                        var cli_info = $.unique(array.sort());
+                        for(i=0;i<cli_info.length;i++){
+                            op_cont = '<option value=' + cli_info[i] + '>' + cli_info[i] + '</option>';
+                            $('#s_get_name').append(op_cont);
+                        }
+                    }else{
+                        $.notify({
+                            message:"获取客户失败",
+                        },
+                        {
+                            type: 'myfail',
+                        });
+                    }
+                }
+            });
+        });
+
+        // 查询 show_cli_account
+        $("#e_get_name").change(function () {
+            $("#e_get_account").children("option:gt(0)").remove();
+            var cli_name = $("#e_get_name").val();
+            $.ajax({
+                type: "POST",
+                url: "show_cli_account",
+                data: {
+                    "cli_name":cli_name,
+                },
+                success: function (result) {
+                    var info_object = $.parseJSON(result);
+                    if (info_object.code === "0"){
+                        // msg: <[{},{}]>
+                        for(i=0;i<info_object.msg.length;i++) {
+                            item = info_object.msg[i];
+                            op_cont = '<option value=' + item.account + '>' + item.account + '</option>';
+                            $("#e_get_account").append(op_cont);
+                        }
+                    }else{
+                        $.notify({
+                            message:"获取客户失败",
+                        },
+                        {
+                            type: 'myfail',
+                        });
+                    }
+                }
+            });
+        });
+        $("#s_get_name").change(function () {
+            $("#s_get_account").children("option:gt(0)").remove();
+            var cli_name = $("#s_get_name").val();
+            $.ajax({
+                type: "POST",
+                url: "show_cli_account",
+                data: {
+                    "cli_name":cli_name,
+                },
+                success: function (result) {
+                    var info_object = $.parseJSON(result);
+                    if (info_object.code === "0"){
+                        // msg: <[{},{}]>
+                        for(i=0;i<info_object.msg.length;i++) {
+                            item = info_object.msg[i];
+                            op_cont = '<option value=' + item.account + '>' + item.account + '</option>';
+                            $("#s_get_account").append(op_cont);
+                        }
+                    }else{
+                        $.notify({
+                            message:"获取客户失败",
+                        },
+                        {
+                            type: 'myfail',
+                        });
+                    }
+                }
+            });
+        });
+
+        //事件新增 add_event()
+        function add_event() {
+            var add_name = $("#e_get_name").val();
+            var add_account = $("#e_get_account").val();
+            var add_product = $("#add_product").val();
+            var add_type = $("#add_type").val();
+            var add_detail = $("#add_detail").val();
+            var add_status = $("#add_status").val();
+            var add_manager = $("#add_manager").val();
+            $.ajax({
+                type : "POST",
+                url : "add_event",
+                data : {
+                    "add_name" : add_name,
+                    "add_account" : add_account,
+                    "add_product": add_product,
+                    'add_type': add_type,
+                    'add_detail': add_detail,
+                    'add_status': add_status,
+                    'add_manager': add_manager,
+                },
+                success : function(result) {
+                    var info_object = $.parseJSON(result);
+                    if (info_object[0].code === '0'){
+                        $.notify({
+                            message:info_object[0].msg,
+                        },
+                        {
+                            type: 'mysuccess',
+                        });
+                    }else{
+                        $.notify({
+                            message:info_object[0].msg,
+                        },
+                        {
+                            type: 'myfail',
+                        });
+                    }
+                    }
+            });
+
+        }
+
+        //记录查询
+        function show_event(){
+            $("#select_table tbody").children("tr:gt(0)").empty();
+            $.ajax({
+                type : "POST",
+                url : "show_cli",
+                data : {
+                },
+                success : function(result) {
+                    var info_object = $.parseJSON(result);
+                    if (info_object.code === "0"){
+                        // msg: <[{},{}]>
+                        for(i=0;i<info_object.msg.length;i++){
+                            item = info_object.msg[i];
+                            tr_cont = '<tr><td>'
+                                + item.name +'</td><td>'
+                                + item.account+ '</td><td>'
+                                + item.cloud+ '</td><td>'
+                                + item.api_id+ '</td><td>'
+                                + item.api_key +
+                                '</td></tr>';
+                            $("#select tbody").append(tr_cont);
+                        }
+                    }else{
+                        $.notify({
+                            message:"查询失败",
+                        },
+                        {
+                            type: 'myfail',
+                        });
+                    }
+                }
+            });
+        }
+
+        //事件记录表显示
+        function  show_event_info() {
+            var cli_name = $("#s_get_name").val();
+            var cli_account = $("#s_get_account").val();
+            var period = $("#period").val();
+            $("#event_table tbody").children("tr:gt(0)").remove();
+            $.ajax({
+                type: "POST",
+                url: "show_event_info",
+                data: {
+                    'cli_name': cli_name,
+                    'cli_account': cli_account,
+                    'period': period,
+                },
+                success: function (result) {
+                    var info_object = $.parseJSON(result);
+                    if (info_object.code === "0"){
+                        // msg: <[{},{}]>
+                        for(i=0;i<info_object.msg.length;i++){
+                            item = info_object.msg[i];
+                            if(item.method === 0){
+                                method = "自动"
+                            }
+                            else{
+                                method = "手动"
+                            }
+                            tr_cont = '<tr><td>'
+                                + item.date +'</td><td>'
+                                + method + '</td><td>'
+                                + item.type + '</td><td>'
+                                + item.detail + '</td><td>'
+                                + item.product +'</td><td>'
+                                + item.status +'</td><td>'
+                                + item.manager +'</td></tr>';
+                            $("#event_table tbody").append(tr_cont);
+                        }
+                    }else{
+                        $.notify({
+                            message:info_object.msg,
+                        },
+                        {
+                            type: 'myfail',
+                        });
+                    }
+                }
+            });
+        }
+
+        //巡检表显示
+        $("#check_table tbody").children("tr:gt(0)").remove();
+        $.ajax({
+            type : "POST",
+            url : "show_cli",
+            data : {},
+            success : function(result) {
+                var info_object = $.parseJSON(result);
+                if (info_object.code === "0"){
+                    // msg: <[{},{}]>
+                    for(i=0;i<info_object.msg.length;i++){
+                        item = info_object.msg[i];
+                        if (item.cloud === "txy")
+                        {
+                            cloud = "腾讯云"
+                        }
+                        else if(item.cloud === "aliy")
+                        {
+                            cloud = "阿里云"
+                        }
+                        tr_cont = '<tr><td>'
+                            + item.name +'</td><td>'
+                            + item.account + '</td><td>'
+                            + cloud + '</td>' +
+                            '<td><button class="btn btn-info btn-group-xs" onclick="check_confirm(this)">开始巡检</button></td>';
+                        $("#check_table tbody").append(tr_cont);
+                    }
+                }else{
+                    $.notify({
+                        message:"查询失败",
+                    },
+                    {
+                        type: 'myfail',
+                    });
+                }
+            }
+        });
+
+        //确认是否巡检
+        function  check_confirm(get){
+            var array = new Array(0);
+            var get_info = new Array(0);
+            if ($(get).attr('id') === "check_all"){
+                num = $(get).parent().find("tr").length -1;
+                for (j=1;j<=num;j++){
+                    for(i=0;i<3;i++){
+                        temp = $(get).parent().find("tr").eq(j).children(':eq('+ i + ')').text();
+                        array.push(temp);
+                    }
+                    get_info.push(array);
+                    array = []
+                }
+            }else {
+                for(i=0;i<$(get).parent().index();i++){
+                    temp = $(get).parent().parent().children(':eq('+ i + ')').text();
+                    array.push(temp);
+                }
+                get_info.push(array);
+            }
+            let x;
+            let r;
+            r = window.confirm("是否开始巡检？");
+            if (r === true){
+                check_start(get_info);
+            }
+
+    }
+
+        //开始巡检
+        function check_start(get_info){
+            alert(get_info);
+            $.ajax({
+                type : "POST",
+                url : "check_start",
+                data : {
+
+                },
+                success : function(result) {
+                    var info_object = $.parseJSON(result);
+                    if (info_object.code === "0"){
+                        // msg: <[{},{}]>
+                        $.notify({
+                            message:"巡检结束",
+                        }, {
+                            type: 'mysuccess',
+                        });
+                    }else{
+                        $.notify({
+                            message:"巡检失败",
+                        }, {
+                            type: 'myfail',
+                        });
+                    }
+                }
+            });
+        }
+
+        $('input:radio[name="check_cloud"]').change(function() {
+            alert("ok");
+            var check_cloud = $('input[name="check_cloud"]:checked').val();
+            $.ajax({
+            type : "POST",
+            url : "show_region",
+            data : {
+                "cloud": check_cloud,
+                },
+            success : function(result) {
+                var info_object = $.parseJSON(result);
+                if (info_object.code === "0") {
+                    alert("ok")
+                } else {
+                }
+            }
+            });
+        });
+
+    </script>
+
+</html>

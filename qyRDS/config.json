@@ -1,0 +1,18 @@
+{
+  "id": "",
+  "key":"",
+  "region": "",
+  "migration_job_name": "",
+  "sourceRDS": {
+    "id": "",
+    "account": "",
+    "password": "",
+    "sourceDB": ""
+  },
+  "targetRDS": {
+    "id": "",
+    "account": "",
+    "password": "",
+    "targetDB": ""
+  }
+}

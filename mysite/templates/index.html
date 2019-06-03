@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+       <title>日常巡检</title>
+       <!-- 引入 Bootstrap -->
+       <link href="/static/css/bootstrap.css" rel="stylesheet">
+       <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+        <script src="/static/js/jquery.js"></script>
+        <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+        <script src="/static/js/bootstrap.js"></script>
+       <!--加载notify js插件-->
+       <script src="/static/bootstrap-notify-master/bootstrap-notify.js"></script>
+       <link href="/static/animate.min.css" rel="stylesheet">
+       <!--自定义css样式-->
+       <link href="/static/css/mystyle.css" rel="stylesheet">
+       <style>
+           body{
+               width: 100%;
+               height: 100%;
+               padding: 100px;
+               background-image: url(/static/totolo4.jpg);
+               background-repeat:no-repeat;
+               background-size:100% 100%;
+               -moz-background-size:100% 100%;
+               background-color: whitesmoke;
+           }
+           .mydiv{
+               width:400px;
+               height:250px;
+               background-color: #c8cb86;
+               position:absolute;
+               left:50%; top:50%;
+               margin-left:-100px;
+               margin-top:-120px;
+               text-align:center;
+            }
+           table{
+                border-collapse:collapse;
+                border-spacing:0;
+                margin:0;
+                padding:0;
+                border:0;
+            }
+           .vintage2{
+                margin: 0px;
+                padding-bottom: 20px;
+                color: transparent;
+                background-color: rgba(35, 30, 24, 0.85);
+                -webkit-background-clip : text;
+           }
+           label {
+            font-size: 14px;
+            float: left;
+            margin-left: 40px;
+            vertical-align: middle;
+            }
+           input {
+               padding: 0 10px;
+           }
+           .for_a{
+               float: right;margin-right: 50px;text-decoration:underline
+           }
+       </style>
+    </head>
+    <body>
+        <!--头部导航条start-->
+        <nav class="navbar navbar-default navbar-fixed-top" style="background: rgba(0,0,0,0.0);border: none;">
+            <div class="container">
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-left">
+                    <a class="navbar-brand" href="#" style="color: #bb9979">BUBBLE</a>
+                </div>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" style="color: #bb9979;" onclick="refresh()">登录</a>
+                        </li>
+                        <li>
+                            <a href="#" id="register" style="color: #bb9979">注册</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!--头部导航条end-->
+        <!--------------- 登录窗口 start------------->
+        <div class="mydiv" id="div_login">
+            <div>
+                <br/>
+                <h3 class="vintage2">日常巡检系统</h3>
+            </div>
+            <form action="login" method="post" style="text-align: right;padding: 10px">
+                <p style="margin-right: 50px">
+                    <label for="login_name"><span class="glyphicon glyphicon-user"></span> 账号</label>
+                    <input type="text" name="login_name" />
+                </p>
+                <p style="margin-right: 50px">
+                    <label for="login_password"><span class="glyphicon glyphicon-lock"> </span> 密码</label>
+                    <input name="login_password" type="password" />
+                </p>
+                <p style="margin-right: 50px">
+                    <label for="login_sf" ><span class="glyphicon glyphicon-lock"> </span> 身份</label>
+                    <input name="login_sf"  type="radio" value="admin" />管理员
+                    <input name="login_sf" checked="checked" type="radio" value="user"/>普通用户
+                </p>
+                <p style="text-align: center;">
+                    <span id="error_msg" style="color: red;margin-left:110px;">{{ error_msg }}</span>
+                    <a href="#" class="for_a">忘记密码</a>
+                </p>
+                <p style="text-align: center;">
+                <input class="btn btn-info"  type="submit" value="立即登录" />
+                </p>
+            </form>
+        </div>
+        <!---------------登录窗口end---------------->
+        <!---------------注册窗口start-------------->
+        <div class="mydiv" style="display: none;" id="div_register">
+            <form style="text-align: right;margin: 40px 20px 20px 20px">
+                <p>
+                    <label for="register_name"><span class="glyphicon glyphicon-user"></span> 账号</label>
+                    <input type="text" name="register_name" id="register_name"/>
+                </p>
+                <p>
+                    <label for="register_password"><span class="glyphicon glyphicon-lock"></span> 密码</label>
+                    <input name="register_password" id="register_password" type="password" />
+                </p>
+                <p>
+                    <label for="retry_password"><span class="glyphicon glyphicon-lock"></span> 确认密码</label>
+                    <input name="retry_password" id="retry_password" type="password" />
+                </p>
+                <br/>
+                <p style="text-align: center">
+                    <input class="btn btn-info" onclick="register()" value="立即注册" />
+                </p>
+            </form>
+                <p style="text-align: center">
+                    <span id="info_msg" style="color: blue;"></span>
+                    <span id="r_error_msg" style="color: red;"></span>
+                </p>
+        </div>
+        <!---------------注册窗口end---------------->
+    </body>
+    <script>
+        $("#register").click(function () {
+            $("#div_login").hide();
+            $("#div_register").show();
+        }
+        );
+
+
+        function  refresh() {
+            location.reload()
+        }
+        function register() {
+            var ajax_r_name = $("#register_name").val();
+            var ajax_r_pwd = $("#register_password").val();
+            var ajax_retry_pwd = $("#retry_password").val();
+            //ajax 提交注册信息
+            $.ajax({
+			     type : "POST",
+			     url : "register",
+			     data : {
+			         "ajax_name" : ajax_r_name,
+                     'ajax_pwd': ajax_r_pwd,
+                     'ajax_retry_pwd': ajax_retry_pwd
+			     },
+			     success : function(result) {
+                     var info_object = $.parseJSON(result);
+                     for (var i=0;i<info_object.length;i++){
+                        if (info_object[i].code_msg === '0') {
+                            $("#r_error_msg").html('');
+                            $("#info_msg").html('注册成功!');
+                        }
+                        else{
+                                $("#r_error_msg").html(info_object[i].r_error_msg);
+                                $("#info_msg").html('');
+                        }
+                     }
+ 			     }
+		    });
+		    //ajax end
+        }
+    </script>
+</html>

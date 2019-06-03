@@ -1,0 +1,19 @@
+{
+  "info": [
+  {
+    "name":"",
+    "id": "",
+    "key": "",
+    "type": "aliyun",
+    "property": ["ecs", "cbs", "rds", "vpn"]
+  },
+    {
+    "name": "",
+    "id":"",
+    "key": "",
+    "region": "ap-",
+    "type": "txy",
+    "property": ["cvm","cbs","vpn","nat","rds"]
+  }
+  ]
+}
