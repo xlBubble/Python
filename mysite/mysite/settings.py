@@ -82,9 +82,8 @@ DATABASES = {
     'ENGINE': 'django.db.backends.mysql',
     'NAME':'bubble',
     'USER': 'root',
-    'PASSWORD': '51idc.coM',
-    # 'HOST': '119.28.132.236',
-    'HOST': '172.20.2.243',
+    'PASSWORD': '',
+    'HOST': '',
     'PORT': '3306',
     }
 }
