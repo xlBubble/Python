@@ -1,3 +1,4 @@
+# /bin/python3.5
 # _*_coding:utf-8 _*_
 from aliyunsdkcore import client
 from aliyunsdkrds.request.v20140815.DescribeDatabasesRequest import DescribeDatabasesRequest
@@ -11,9 +12,13 @@ import json
 import logging
 import gaojing
 import time
+import os
+import time
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 with open("config.json", 'r') as f:
     params = json.load(f)
+f.close()
 
 clt = client.AcsClient(params['id'], params['key'], params['region'])
 migration_job_name = params['migration_job_name']
@@ -28,16 +33,16 @@ targetRDSAccount = params["targetRDS"]["account"]
 targetRDSPassword = params["targetRDS"]["password"]
 targetDBName = params["targetRDS"]["targetDB"]
 
-
 migration_object = [{
-    "DBName":  sourceDBName,
+    "DBName": sourceDBName,
     "NewDBName": targetDBName
-    }
+}
 ]
 
-
-logging.basicConfig(level=logging.DEBUG,
-                    filename='accesslog.txt',
+file_date = time.strftime("%Y%m%d", time.localtime())
+filename = 'log/accesslog' + '_' + file_date + '.txt'
+logging.basicConfig(level=logging.INFO,
+                    filename=filename,
                     filemode='a',
                     format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s'
                     )
@@ -56,8 +61,6 @@ def delete_database():
         return response_detail
     except Exception as e:
         logging.error(e)
-        exit(1)
-    pass
 
 
 def show_database():
@@ -87,7 +90,6 @@ def create_migration_job():
         return response_detail
     except Exception as e:
         logging.error(e)
-        exit(1)
 
 
 def config_migration_job(migration_job_id):
@@ -104,13 +106,6 @@ def config_migration_job(migration_job_id):
     request.set_SourceEndpointEngineName('MySQL')
     request.set_SourceEndpointUserName(sourceRDSAccount)
     request.set_SourceEndpointPassword(sourceRDSPassword)
-    # request.set_SourceEndpointInstanceType('LocalInstance')
-    # request.set_SourceEndpointEngineName('MySQL')
-    # request.set_SourceEndpointRegion('cn-shanghai')
-    # request.set_SourceEndpointIP('119.28.132.236')
-    # request.set_SourceEndpointPort('3306')
-    # request.set_SourceEndpointUserName('root')
-    # request.set_SourceEndpointPassword('51idc.coM')
     # 配置目标库
     request.set_DestinationEndpointInstanceType('RDS')
     request.set_DestinationEndpointRegion(params['region'])
@@ -131,9 +126,11 @@ def config_migration_job(migration_job_id):
     except Exception as e:
         logging.error(e)
 
+
 def show_migration_status(migration_job_id):
     try:
-        request = CommonRequest(domain='dts.aliyuncs.com', version='2018-08-01', action_name='DescribeMigrationJobStatus')
+        request = CommonRequest(domain='dts.aliyuncs.com', version='2018-08-01',
+                                action_name='DescribeMigrationJobStatus')
         request.add_query_param('MigrationJobId', migration_job_id)
         request.add_query_param('PageNumber', '1')
         request.add_query_param('PageSize', '30')
@@ -179,48 +176,65 @@ def get_db_list(db_info):
     return db_list
 
 
+def check_migration():
+    migration_job_id = create_migration_job()
+    config_migration_job(migration_job_id)
+    if not True:
+        value = "Failed(迁移配置失败)"
+        logging.error(value)
+        gaojing.main(value, filename)
+    while True:
+        status = show_migration_status(migration_job_id)
+        if status == 'PrecheckFailed':
+            value = "Failed(预检查失败)"
+            logging.error(value)
+            gaojing.main(value, filename)
+            break
+        elif status == 'MigrationFailed':
+            value = "Failed(迁移失败)"
+            logging.error(value)
+            gaojing.main(value, filename)
+            break
+        elif status == 'NotStarted':
+            value = "NotStarted(未启动)"
+            logging.error(value)
+            gaojing.main(value, filename)
+            break
+        elif status == 'Suspengding':
+            value = "Subpending(暂停中)"
+            logging.error(value)
+            gaojing.main(value, filename)
+            break
+        elif status == 'Finished':
+            value = "Success"
+            logging.info(value)
+            get_db_list(show_database())
+            gaojing.main(value, filename)
+            break
+        else:
+            logging.info(status)
+            time.sleep(1800)
+            continue
+
+
 if __name__ == '__main__':
-    with open('accesslog.txt', 'w') as file:
-        file.truncate()
     logging.info("数据库迁移：%s.%s TO %s.%s " % (sourceRDSId, sourceDBName, targetRDSId, targetDBName))
-    get_db_list(show_database())
-    # 删除数据库
-    logging.debug(delete_database())
-    time.sleep(5)
+    gaojing.main("start", filename)
     db_list = get_db_list(show_database())
-    if targetDBName in db_list:
-        logging.info("ATTENTION: DATABASE %s still exists!" % params['targetRDS']['targetDB'])
-        logging.error("数据库未删除")
-        gaojing.main("Failed(数据库未删除)")
-        exit(1)
-    else:
+    if targetDBName not in db_list:
+        logging.error("数据库不存在")
         # 开始迁移
-        migration_job_id = create_migration_job()
-        config_migration_job(migration_job_id)
-        while True:
-            #precheck_status = show_migration_status(migration_job_id)['PrecheckStatus']['Status']
-            #structure_initialization_status = show_migration_status(migration_job_id)['StructureInitializationStatus']['Status']
-            #data_nitialization_status = show_migration_status(migration_job_id)['DataInitializationStatus']['Status']
-            #logging.info("预检查：%s,结构迁移：%s,全量迁移：%s" %(precheck_status, structure_initialization_status, data_nitialization_status))
-            status = show_migration_status(migration_job_id)
-            if status == 'PrecheckFailed':
-                value = "Failed(预检查失败)"
-                logging.error(value)
-                gaojing.main(value)
-                break
-            elif status == 'MigrationFailed':
-                value = "Failed(迁移失败)"
-                logging.error(value)
-                gaojing.main(value)
-                break
-            elif status == 'Finished':
-                print("i am ok")
-                value = "Success"
-                logging.info(value)
-                get_db_list(show_database())
-                gaojing.main(value)
-                break
-            else:
-                logging.info(status)
-                time.sleep(60)
-                continue
+        check_migration()
+    else:
+        # 删除数据库
+        delete_database()
+        time.sleep(5)
+        db_list = get_db_list(show_database())
+        if targetDBName in db_list:
+            logging.info("ATTENTION: DATABASE %s still exists!" % params['targetRDS']['targetDB'])
+            logging.error("数据库未删除")
+            gaojing.main("Failed(数据库未删除)", filename)
+            exit(1)
+        else:
+            # 开始迁移
+            check_migration()
