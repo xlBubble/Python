@@ -99,7 +99,7 @@ if __name__ == "__main__":
     start = time.time()
     fetch_proxy(5)
     proxy_ips = proxypool()
-    get_movie('科幻', 50, proxy_ips)
+    get_movie('悬疑', 20, proxy_ips)
     end = time.time()
     time_diff = end-start
     print('总耗时: {}s'.format(time_diff))

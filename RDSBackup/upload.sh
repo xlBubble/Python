@@ -24,6 +24,7 @@ upload(){
 	./ossutil64 cp --retry-times=100 --disable-crc64  $1 $BUCKET/$FILENAME &> /dev/null
 	if [ $? == 0 ];then
 		echo "`date +%F' '%T` - $0 - INFO: 上传成功" >> $LOGPATH/$LOGFILE
+		rm -f $BAKPATH/$FILENAME
 	else
 		echo "`date +%F' '%T` - $0 - ERROR: 上传失败" >> $LOGPATH/$LOGFILE
 	fi
